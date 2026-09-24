@@ -8,18 +8,26 @@ Para executar:
     streamlit run app.py
 """
 
+import json
+import re
 from pathlib import Path
 
 import folium
 import pandas as pd
 import streamlit as st
+from folium.plugins import TreeLayerControl
 
 # ---------------------------------------------------------------------------
 # Configurações
 # ---------------------------------------------------------------------------
 
-ARQUIVO_DADOS = Path(__file__).parent / "dados" / "SAR_2021-2025_consolidado.xlsx"
+PASTA_DADOS = Path(__file__).parent / "dados"
+ARQUIVO_DADOS = PASTA_DADOS / "SAR_2021-2025_consolidado.xlsx"
 ABA_DADOS = "Base de dados"
+
+# Áreas de jurisdição dos Distritos Navais, já simplificadas por
+# preparar_areas.py. Cada arquivo tem a área de um Distrito.
+PASTA_AREAS = PASTA_DADOS / "areas"
 
 # Colunas da planilha usadas no mapa e o nome simplificado de cada uma no código.
 COLUNAS = {
@@ -50,6 +58,18 @@ CORES = {
     "Sem registro de pessoas": "#8a8984",
 }
 
+# Cor da área de cada Distrito Naval, pelo número do Distrito. São tons
+# diferentes do vermelho e do azul dos marcadores, para não confundir a área
+# com a situação das pessoas. Um Distrito sem cor na lista fica cinza.
+CORES_AREAS = {
+    1: "#eda100",
+    2: "#1baf7a",
+    3: "#4a3aa7",
+    4: "#e87ba4",
+    5: "#008300",
+}
+COR_AREA_PADRAO = "#8a8984"
+
 # CSS para o mapa ocupar toda a tela, abaixo do título.
 ESTILO = """
 <style>
@@ -79,6 +99,32 @@ def carregar_dados():
 
     df["situacao_pessoas"] = df.apply(classificar_situacao, axis=1)
     return df
+
+
+@st.cache_data
+def carregar_areas(salvamar_por_distrito):
+    """
+    Lê as áreas dos Distritos Navais da pasta dados/areas.
+
+    Devolve uma lista com o número, o rótulo e o desenho (GeoJSON) de cada
+    área, na ordem do número do Distrito.
+    """
+    areas = []
+    for arquivo in sorted(PASTA_AREAS.glob("*.json")):
+        geojson = json.loads(arquivo.read_text(encoding="utf-8"))
+        propriedades = geojson["features"][0]["properties"]
+
+        # A sigla vem como "1° DN"; aqui guardamos só o número do Distrito.
+        numero = int(re.search(r"\d+", propriedades["sigla"]).group())
+
+        # O nome do Salvamar vem da planilha, para usar as mesmas palavras do
+        # filtro lateral. Um Distrito ausente da planilha fica sem esse trecho.
+        salvamar = salvamar_por_distrito.get(numero)
+        rotulo = f"{numero}º DN" + (f" — {salvamar}" if salvamar else "")
+
+        areas.append({"numero": numero, "rotulo": rotulo, "geojson": geojson})
+
+    return sorted(areas, key=lambda area: area["numero"])
 
 
 def classificar_situacao(incidente):
@@ -132,9 +178,12 @@ def texto_popup(incidente):
     return texto
 
 
-def criar_mapa(incidentes):
-    """Cria o mapa do OpenStreetMap com um círculo para cada incidente."""
+def criar_mapa(incidentes, areas):
+    """Cria o mapa do OpenStreetMap com as áreas dos Distritos e os incidentes."""
     mapa = folium.Map(location=[-15, -45], zoom_start=4, tiles="OpenStreetMap")
+
+    # As áreas entram primeiro, para ficarem embaixo dos incidentes.
+    adicionar_areas(mapa, areas)
 
     # Desenha os grupos na ordem inversa da legenda, para que os incidentes
     # com óbito ou desaparecido fiquem por cima dos demais.
@@ -161,6 +210,48 @@ def criar_mapa(incidentes):
 
     adicionar_legenda(mapa, incidentes)
     return mapa
+
+
+def adicionar_areas(mapa, areas):
+    """
+    Desenha a área de cada Distrito Naval e cria, no canto superior direito,
+    o menu que liga e desliga cada área e todas de uma vez.
+    """
+    if not areas:
+        return
+
+    itens_do_menu = []
+    for area in areas:
+        cor = CORES_AREAS.get(area["numero"], COR_AREA_PADRAO)
+
+        # Cada área fica em seu próprio grupo, para poder ser ligada e
+        # desligada sozinha pelo menu.
+        grupo = folium.FeatureGroup(name=area["rotulo"], show=True)
+        folium.GeoJson(
+            area["geojson"],
+            # O preenchimento é bem claro, para não esconder o mapa nem
+            # competir com as cores dos incidentes.
+            style_function=lambda _, cor=cor: {
+                "color": cor,
+                "weight": 2.5,
+                "fillColor": cor,
+                "fillOpacity": 0.08,
+            },
+            tooltip=area["rotulo"],
+        ).add_to(grupo)
+        grupo.add_to(mapa)
+
+        itens_do_menu.append({"label": area["rotulo"], "layer": grupo})
+
+    TreeLayerControl(
+        overlay_tree={
+            "label": "Áreas dos Distritos Navais",
+            "selectAllCheckbox": "Ligar ou desligar todas as áreas",
+            "children": itens_do_menu,
+        },
+        position="topright",
+        collapsed=False,
+    ).add_to(mapa)
 
 
 def adicionar_legenda(mapa, incidentes):
@@ -234,6 +325,13 @@ incidentes = filtrar_incidentes(
     df, anos, salvamares, tipos, com_obitos, com_desaparecidos, com_sobreviventes
 )
 
+# Nome do Salvamar de cada Distrito Naval, para rotular as áreas do mapa.
+# Na planilha o Distrito vem como "1ºDN"; aqui guardamos apenas o número.
+salvamar_por_distrito = {
+    int(re.search(r"\d+", distrito).group()): salvamar
+    for distrito, salvamar in df[["distrito_naval", "salvamar"]].drop_duplicates().values
+}
+
 # Mapa ocupando o restante da tela.
-mapa = criar_mapa(incidentes)
+mapa = criar_mapa(incidentes, carregar_areas(salvamar_por_distrito))
 st.iframe(mapa.get_root().render(), height=600)
