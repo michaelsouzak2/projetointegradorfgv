@@ -216,3 +216,6 @@ __marimo__/
 
 # Streamlit
 .streamlit/secrets.toml
+
+# Planilha de dados do projeto: o repositório é público, então ela não é versionada.
+dados/*.xlsx
