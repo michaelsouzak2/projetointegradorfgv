@@ -27,7 +27,11 @@ Passe o mouse sobre um círculo para ver o identificador e o tipo do incidente. 
 
 No canto superior direito do mapa há um menu com as áreas de jurisdição dos Distritos Navais, que correspondem às áreas dos Salvamares regionais. Cada área pode ser ligada e desligada sozinha, e a caixa **"Áreas dos Distritos Navais"**, no topo do menu, liga e desliga todas de uma vez.
 
-Cada área tem sua própria cor, em tons diferentes do vermelho e do azul dos incidentes, para que a área não seja confundida com a situação das pessoas. O preenchimento é bem claro, de modo que os incidentes continuem em primeiro plano. Passe o mouse sobre uma área para ver o nome do Distrito e do Salvamar.
+São nove áreas, do 1º ao 9º Distrito Naval, cobrindo toda a região de busca e salvamento sob responsabilidade brasileira. O rótulo de cada uma junta o número do Distrito ao nome do Salvamar, e passando o mouse sobre a área esse nome aparece.
+
+As áreas usam **quatro cores para as nove áreas**. Nove tons bem diferentes entre si não existem: alguns ficariam parecidos demais, inclusive para quem tem daltonismo. Como no mapa o que importa é enxergar onde uma área termina e a outra começa, basta que Distritos vizinhos tenham cores diferentes, e as cores foram distribuídas assim. Distritos que dividem a mesma cor ficam longe um do outro, como o 1º, no Rio de Janeiro, e o 9º, em Manaus.
+
+Os tons também evitam o vermelho e o azul dos incidentes, para que a área não seja confundida com a situação das pessoas, e o preenchimento é bem claro, de modo que os incidentes continuem em primeiro plano.
 
 ## Como executar
 
@@ -65,17 +69,17 @@ Observações:
 
 ### Áreas dos Distritos Navais
 
-As áreas vêm em arquivos GeoJSON, um por Distrito Naval, em SIRGAS 2000 (EPSG:4674). Por enquanto o projeto tem as áreas do 1º ao 5º Distrito. Ao acrescentar as demais, basta colocar o arquivo em `dados/areas_originais/` e rodar o script de preparação: o mapa passa a mostrar a nova área sozinho.
+As áreas vêm em arquivos GeoJSON, um por Distrito Naval, em SIRGAS 2000 (EPSG:4674). Para acrescentar ou atualizar uma área, basta colocar o arquivo em `dados/areas_originais/` e rodar o script de preparação: o mapa passa a mostrar a área sozinho, sem mexer no código. O número do Distrito é lido do campo `id_dn`, porque a sigla varia de arquivo para arquivo (`1° DN`, `6º DN`, `9º`). Arquivos no formato `Polygon` ou `MultiPolygon` são aceitos.
 
-Os arquivos originais são muito detalhados para um mapa de todo o Brasil: são 13 casas decimais e até 51 mil pontos por área, somando 5,8 MB. O script `preparar_areas.py` reduz esse detalhe e grava o resultado em `dados/areas/`:
+Os arquivos originais são muito detalhados para um mapa de todo o Brasil: são 13 casas decimais e até 91 mil pontos por área, somando 15 MB. O script `preparar_areas.py` reduz esse detalhe e grava o resultado em `dados/areas/`:
 
 ```bash
 python preparar_areas.py
 ```
 
-A simplificação usa o algoritmo de Ramer-Douglas-Peucker, com tolerância de 0,005 grau (cerca de 550 metros), e arredonda as coordenadas para 4 casas decimais (cerca de 11 metros). O conjunto cai de 5,8 MB para 118 KB, sem mudança visível na escala em que o mapa é usado. O app lê apenas a pasta `dados/areas/`, então não é preciso rodar o script de novo para usar o painel.
+A simplificação usa o algoritmo de Ramer-Douglas-Peucker, com tolerância de 0,005 grau (cerca de 550 metros), e arredonda as coordenadas para 4 casas decimais (cerca de 11 metros). O conjunto cai de 15 MB para 296 KB, sem mudança visível na escala em que o mapa é usado. O app lê apenas a pasta `dados/areas/`, então não é preciso rodar o script de novo para usar o painel.
 
-O rótulo de cada área junta o número do Distrito com o nome do Salvamar, tirado da própria planilha. Assim o mapa usa as mesmas palavras do filtro lateral.
+O nome do Salvamar que aparece no rótulo vem da própria planilha. Assim o mapa usa as mesmas palavras do filtro lateral.
 
 ## Estrutura
 

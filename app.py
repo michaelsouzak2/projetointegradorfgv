@@ -58,15 +58,28 @@ CORES = {
     "Sem registro de pessoas": "#8a8984",
 }
 
-# Cor da área de cada Distrito Naval, pelo número do Distrito. São tons
-# diferentes do vermelho e do azul dos marcadores, para não confundir a área
-# com a situação das pessoas. Um Distrito sem cor na lista fica cinza.
+# Cor da área de cada Distrito Naval, pelo número do Distrito.
+#
+# São quatro cores para nove áreas. Nove tons bem diferentes entre si não
+# existem: alguns ficariam parecidos demais, inclusive para quem tem
+# daltonismo. Como no mapa o que importa é enxergar onde uma área termina e
+# a outra começa, basta que Distritos vizinhos tenham cores diferentes, e é
+# assim que as cores abaixo foram distribuídas. Distritos que dividem a mesma
+# cor ficam longe um do outro (por exemplo, o 1º no Rio e o 9º em Manaus).
+#
+# Os tons também evitam o vermelho e o azul dos marcadores, para não
+# confundir a área com a situação das pessoas.
+# Um Distrito sem cor na lista fica cinza.
 CORES_AREAS = {
-    1: "#eda100",
-    2: "#1baf7a",
-    3: "#4a3aa7",
-    4: "#e87ba4",
-    5: "#008300",
+    1: "#eda100",  # amarelo
+    2: "#1baf7a",  # verde-água
+    3: "#eda100",
+    4: "#4a3aa7",  # violeta
+    5: "#eda100",
+    6: "#1baf7a",
+    7: "#e87ba4",  # rosa
+    8: "#4a3aa7",
+    9: "#eda100",
 }
 COR_AREA_PADRAO = "#8a8984"
 
@@ -114,8 +127,9 @@ def carregar_areas(salvamar_por_distrito):
         geojson = json.loads(arquivo.read_text(encoding="utf-8"))
         propriedades = geojson["features"][0]["properties"]
 
-        # A sigla vem como "1° DN"; aqui guardamos só o número do Distrito.
-        numero = int(re.search(r"\d+", propriedades["sigla"]).group())
+        # O número do Distrito. A sigla varia de arquivo para arquivo
+        # ("1° DN", "6º DN", "9º"), por isso usamos o campo id_dn.
+        numero = int(propriedades["id_dn"])
 
         # O nome do Salvamar vem da planilha, para usar as mesmas palavras do
         # filtro lateral. Um Distrito ausente da planilha fica sem esse trecho.
