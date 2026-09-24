@@ -23,6 +23,12 @@ Um filtro vazio não restringe nada. A cor de cada círculo indica a situação 
 
 Passe o mouse sobre um círculo para ver o identificador e o tipo do incidente. Clique para ver os detalhes.
 
+## Áreas dos Distritos Navais
+
+No canto superior direito do mapa há um menu com as áreas de jurisdição dos Distritos Navais, que correspondem às áreas dos Salvamares regionais. Cada área pode ser ligada e desligada sozinha, e a caixa **"Áreas dos Distritos Navais"**, no topo do menu, liga e desliga todas de uma vez.
+
+Cada área tem sua própria cor, em tons diferentes do vermelho e do azul dos incidentes, para que a área não seja confundida com a situação das pessoas. O preenchimento é bem claro, de modo que os incidentes continuem em primeiro plano. Passe o mouse sobre uma área para ver o nome do Distrito e do Salvamar.
+
 ## Como executar
 
 1. Instale o Python 3.10 ou superior.
@@ -57,12 +63,29 @@ Observações:
 - A posição vem das colunas `LATITUDE (GD)` e `LONGITUDE (GD)`. Os 3 eventos com posição aproximada trazem essa informação no detalhe do incidente.
 - O tipo de incidente usa a coluna padronizada `TIPO INCIDENTE (ANEMAR)`.
 
+### Áreas dos Distritos Navais
+
+As áreas vêm em arquivos GeoJSON, um por Distrito Naval, em SIRGAS 2000 (EPSG:4674). Por enquanto o projeto tem as áreas do 1º ao 5º Distrito. Ao acrescentar as demais, basta colocar o arquivo em `dados/areas_originais/` e rodar o script de preparação: o mapa passa a mostrar a nova área sozinho.
+
+Os arquivos originais são muito detalhados para um mapa de todo o Brasil: são 13 casas decimais e até 51 mil pontos por área, somando 5,8 MB. O script `preparar_areas.py` reduz esse detalhe e grava o resultado em `dados/areas/`:
+
+```bash
+python preparar_areas.py
+```
+
+A simplificação usa o algoritmo de Ramer-Douglas-Peucker, com tolerância de 0,005 grau (cerca de 550 metros), e arredonda as coordenadas para 4 casas decimais (cerca de 11 metros). O conjunto cai de 5,8 MB para 118 KB, sem mudança visível na escala em que o mapa é usado. O app lê apenas a pasta `dados/areas/`, então não é preciso rodar o script de novo para usar o painel.
+
+O rótulo de cada área junta o número do Distrito com o nome do Salvamar, tirado da própria planilha. Assim o mapa usa as mesmas palavras do filtro lateral.
+
 ## Estrutura
 
 ```
 .
-├── app.py              # painel Streamlit com o mapa dos incidentes
-├── requirements.txt    # dependências do projeto
+├── app.py                  # painel Streamlit com o mapa dos incidentes
+├── preparar_areas.py       # simplifica os arquivos das áreas dos Distritos Navais
+├── requirements.txt        # dependências do projeto
 └── dados/
-    └── SAR_2021-2025_consolidado.xlsx   # base consolidada dos eventos SAR
+    ├── SAR_2021-2025_consolidado.xlsx   # base consolidada dos eventos SAR
+    ├── areas_originais/                 # áreas dos Distritos como recebidas
+    └── areas/                           # áreas simplificadas, usadas pelo mapa
 ```
