@@ -99,8 +99,14 @@ def main():
 
         for feicao in geojson["features"]:
             geometria = feicao["geometry"]
-            if geometria["type"] != "MultiPolygon":
-                raise ValueError(f"{arquivo.name}: esperado MultiPolygon, veio {geometria['type']}")
+
+            # Alguns arquivos vêm como Polygon e outros como MultiPolygon.
+            # Aqui todos viram MultiPolygon, para o mapa tratar um formato só.
+            if geometria["type"] == "Polygon":
+                geometria["type"] = "MultiPolygon"
+                geometria["coordinates"] = [geometria["coordinates"]]
+            elif geometria["type"] != "MultiPolygon":
+                raise ValueError(f"{arquivo.name}: geometria {geometria['type']} não é aceita")
 
             antes = contar_pontos(geometria["coordinates"])
             geometria["coordinates"] = simplificar_multipoligono(geometria["coordinates"], TOLERANCIA)
