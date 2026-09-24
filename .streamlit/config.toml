@@ -5,6 +5,11 @@
 # de quem abre a página.
 base = "dark"
 
+# Cor de destaque dos controles (botões, caixas marcadas, barra do slider).
+# O padrão do Streamlit é vermelho, a mesma cor que nos gráficos significa
+# "evento com óbito ou desaparecido". O azul evita essa confusão.
+primaryColor = "#2a78d6"
+
 [client]
 # Esconde o menu do canto superior direito. Sem ele, some também a opção de
 # trocar o tema, e o painel fica sempre escuro, como configurado acima.

@@ -4,9 +4,25 @@ Projeto Integrador I do MBA em IA e Ciência de Dados para Transformação Digit
 
 Painel analítico sobre os eventos de Busca e Salvamento (SAR) registrados pelo SALVAMAR BRASIL de 2021 a 2025. O painel busca responder onde, quando e em que tipos de ocorrência se concentram os eventos com óbitos e desaparecidos.
 
+## Páginas do painel
+
+O painel tem cinco páginas, escolhidas no menu lateral. Cada uma responde a uma das perguntas da proposta do projeto.
+
+| Página | Pergunta que responde |
+|---|---|
+| **Mapa dos incidentes** | Onde ocorreu cada um dos 1.391 eventos, e qual foi a situação das pessoas envolvidas. |
+| **Quando acontecem** | As ocorrências se repetem no mesmo período do ano em cada Salvamar? |
+| **Onde se repetem** | Quais áreas registram ocorrências ano após ano? |
+| **Pessoas envolvidas** | Que tipos de incidente e de embarcação estão mais associados a óbitos e desaparecidos? |
+| **Duração dos eventos** | Como a duração se relaciona com a situação final do evento? |
+
+Os filtros do menu lateral são os mesmos em todas as páginas, e a escolha continua valendo ao trocar de página. Assim é possível, por exemplo, selecionar um Salvamar e percorrer as cinco páginas com o mesmo recorte.
+
+As cores têm o mesmo significado em todo o painel: **vermelho** é sempre óbito ou desaparecido e **azul** é sempre sobrevivente ou vida salva.
+
 ## Mapa dos incidentes
 
-O arquivo `app.py` mostra, sobre o OpenStreetMap, a posição de cada um dos 1.391 incidentes SAR. O menu lateral filtra os incidentes por:
+Mostra, sobre o OpenStreetMap, a posição de cada um dos 1.391 incidentes SAR. O menu lateral filtra os incidentes por:
 
 - **Ano**
 - **Salvamar** (em ordem de Distrito Naval)
@@ -22,6 +38,31 @@ Um filtro vazio não restringe nada. A cor de cada círculo indica a situação 
 | Cinza | sem registro de pessoas (nenhum sobrevivente, óbito ou desaparecido registrado) |
 
 Passe o mouse sobre um círculo para ver o identificador e o tipo do incidente. Clique para ver os detalhes.
+
+## Quando acontecem
+
+Mostra o total de eventos por mês e o **índice sazonal** de cada Salvamar: os eventos de um mês divididos pela média mensal do próprio Salvamar. O índice deixa Salvamares com muitos e com poucos eventos na mesma escala, onde 1 é a média e 1,5 significa 50% acima dela.
+
+Um pico só é padrão se ele se repete. Por isso o mapa de calor também informa, ao passar o mouse, **em quantos anos aquele mês ficou acima da média** do Salvamar. Um índice alto vindo de um único ano é um episódio isolado.
+
+## Onde se repetem
+
+Divide a área de busca em células de 0,5 grau de lado, cerca de 55 km, e colore cada uma pela quantidade de eventos. Um botão mostra somente as áreas que registraram ocorrências **em todos os anos** do período selecionado.
+
+Abaixo do mapa, uma tabela lista a maior área recorrente de cada organização militar, com o tipo de incidente mais frequente e a proporção de eventos com óbito ou desaparecido.
+
+## Pessoas envolvidas
+
+Compara duas medidas, que respondem a perguntas diferentes e por isso são usadas juntas:
+
+- **Eventos com óbito ou desaparecido**: de cada 100 eventos da categoria, quantos tiveram ao menos uma vítima.
+- **Pessoas salvas**: de cada 100 pessoas envolvidas, quantas foram salvas.
+
+A comparação pode ser feita por tipo de incidente, classe de embarcação ou Salvamar. As duas medidas são necessárias: na colisão, quase todo evento tem vítima, mas a maior parte das pessoas envolvidas é salva; no homem ao mar acontece o contrário.
+
+## Duração dos eventos
+
+Compara a distribuição da duração entre eventos encerrados e suspensos. A duração reflete a situação final e não a explica: pela doutrina, o evento é suspenso quando as buscas se esgotam sem localizar as vítimas, o que naturalmente exige mais tempo.
 
 ## Áreas dos Distritos Navais
 
@@ -91,13 +132,22 @@ O nome do Salvamar que aparece no rótulo vem da própria planilha. Assim o mapa
 
 ```
 .
-├── app.py                  # painel Streamlit com o mapa dos incidentes
+├── app.py                  # monta o menu de navegação entre as páginas
+├── dados_sar.py            # leitura da base, filtros e cores compartilhados
+├── paginas/
+│   ├── mapa.py             # mapa dos incidentes
+│   ├── calendario.py       # quando acontecem
+│   ├── areas_recorrentes.py# onde se repetem
+│   ├── pessoas.py          # pessoas envolvidas
+│   └── duracao.py          # duração dos eventos
 ├── preparar_areas.py       # simplifica os arquivos das áreas dos Distritos Navais
 ├── requirements.txt        # dependências do projeto
 ├── .streamlit/
-│   └── config.toml         # modo escuro e menu do canto superior direito
+│   └── config.toml         # modo escuro, cor de destaque e menu superior
 └── dados/
     ├── SAR_2021-2025_consolidado.xlsx   # base consolidada dos eventos SAR
     ├── areas_originais/                 # áreas dos Distritos como recebidas
     └── areas/                           # áreas simplificadas, usadas pelo mapa
 ```
+
+Cada página é um arquivo dentro de `paginas/`. Para acrescentar uma página nova, basta criar o arquivo e incluí-lo na lista do `app.py`. Todas as páginas leem a base pelo `dados_sar.py`, então a planilha é lida uma vez só e as medidas são calculadas sempre da mesma forma.
