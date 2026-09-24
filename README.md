@@ -32,8 +32,7 @@ Passe o mouse sobre um círculo para ver o identificador e o tipo do incidente. 
    pip install -r requirements.txt
    ```
 
-3. Crie a pasta `dados/` e coloque nela a planilha `SAR_2021-2025_consolidado.xlsx`. Como o repositório é público, a planilha não é versionada (ver `.gitignore`).
-4. Inicie o painel:
+3. Inicie o painel:
 
    ```bash
    streamlit run app.py
@@ -43,7 +42,7 @@ O mapa precisa de acesso à internet para carregar os blocos do OpenStreetMap e 
 
 ## Dados
 
-O painel lê a aba **Base de dados** da planilha, com um evento SAR por linha. As medidas de pessoas seguem a aba "SOBREVIVENTES, DESAPAR., ÓBITOS" da própria planilha:
+O painel lê a aba **Base de dados** da planilha `dados/SAR_2021-2025_consolidado.xlsx`, com um evento SAR por linha. As medidas de pessoas seguem a aba "SOBREVIVENTES, DESAPAR., ÓBITOS" da própria planilha:
 
 | Medida | Colunas da planilha |
 |---|---|
@@ -64,5 +63,6 @@ Observações:
 .
 ├── app.py              # painel Streamlit com o mapa dos incidentes
 ├── requirements.txt    # dependências do projeto
-└── dados/              # planilha de dados (não versionada)
+└── dados/
+    └── SAR_2021-2025_consolidado.xlsx   # base consolidada dos eventos SAR
 ```
