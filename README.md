@@ -33,6 +33,12 @@ As áreas usam **quatro cores para as nove áreas**. Nove tons bem diferentes en
 
 Os tons também evitam o vermelho e o azul dos incidentes, para que a área não seja confundida com a situação das pessoas, e o preenchimento é bem claro, de modo que os incidentes continuem em primeiro plano.
 
+## Aparência
+
+O arquivo `.streamlit/config.toml` deixa o painel **sempre no modo escuro**, sem seguir a preferência do navegador de quem abre a página, e esconde o menu do canto superior direito. Sem esse menu, some também a opção de trocar o tema, e o modo escuro fica travado.
+
+O mapa em si continua claro, porque usa os blocos do OpenStreetMap.
+
 ## Como executar
 
 1. Instale o Python 3.10 ou superior.
@@ -88,6 +94,8 @@ O nome do Salvamar que aparece no rótulo vem da própria planilha. Assim o mapa
 ├── app.py                  # painel Streamlit com o mapa dos incidentes
 ├── preparar_areas.py       # simplifica os arquivos das áreas dos Distritos Navais
 ├── requirements.txt        # dependências do projeto
+├── .streamlit/
+│   └── config.toml         # modo escuro e menu do canto superior direito
 └── dados/
     ├── SAR_2021-2025_consolidado.xlsx   # base consolidada dos eventos SAR
     ├── areas_originais/                 # áreas dos Distritos como recebidas
