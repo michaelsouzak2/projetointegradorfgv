@@ -23,6 +23,7 @@ paginas = [
     st.Page("paginas/areas_recorrentes.py", title="Onde se repetem", icon="📍"),
     st.Page("paginas/pessoas.py", title="Pessoas envolvidas", icon="🛟"),
     st.Page("paginas/duracao.py", title="Duração dos eventos", icon="⏱️"),
+    st.Page("paginas/estrutura.py", title="Estrutura x demanda", icon="🏛️"),
 ]
 
 st.navigation(paginas).run()
