@@ -6,7 +6,7 @@ Painel analítico sobre os eventos de Busca e Salvamento (SAR) registrados pelo 
 
 ## Páginas do painel
 
-O painel tem cinco páginas, escolhidas no menu lateral. Cada uma responde a uma das perguntas da proposta do projeto.
+O painel tem seis páginas, escolhidas no menu lateral. Cada uma responde a uma das perguntas da proposta do projeto.
 
 | Página | Pergunta que responde |
 |---|---|
@@ -15,6 +15,7 @@ O painel tem cinco páginas, escolhidas no menu lateral. Cada uma responde a uma
 | **Onde se repetem** | Quais áreas registram ocorrências ano após ano? |
 | **Pessoas envolvidas** | Que tipos de incidente e de embarcação estão mais associados a óbitos e desaparecidos? |
 | **Duração dos eventos** | Como a duração se relaciona com a situação final do evento? |
+| **Estrutura x demanda** | A presença institucional do SAR acompanha onde os eventos se concentram? |
 
 Os filtros do menu lateral são os mesmos em todas as páginas, e a escolha continua valendo ao trocar de página. Assim é possível, por exemplo, selecionar um Salvamar e percorrer as cinco páginas com o mesmo recorte.
 
@@ -63,6 +64,20 @@ A comparação pode ser feita por tipo de incidente, classe de embarcação ou S
 ## Duração dos eventos
 
 Compara a distribuição da duração entre eventos encerrados e suspensos. A duração reflete a situação final e não a explica: pela doutrina, o evento é suspenso quando as buscas se esgotam sem localizar as vítimas, o que naturalmente exige mais tempo.
+
+## Estrutura x demanda
+
+Compara a presença institucional do SAR — quantas organizações militares (Capitanias, Delegacias e Agências) existem em cada Salvamar regional — com a quantidade de eventos que ele atende, para verificar se a estrutura acompanha onde os eventos se concentram.
+
+**O que esta página mede, e o que ela não mede.** A base não registra o efetivo — pessoal, embarcações ou aeronaves fixados em cada local. As colunas de "meios empregados" da planilha descrevem o que foi mobilizado para cada evento específico, não um cadastro fixo do que existe estacionado em cada base. A aba `ESTRUTURA SAR` da planilha, por outro lado, lista as 79 organizações que compõem o sistema, com a localização de cada uma e quantos eventos cada uma atendeu — isso é usado como um proxy de presença institucional, não como uma contagem de efetivo. Uma Capitania pode ter uma estrutura bem maior que uma Agência isolada, e essa diferença de porte não aparece só na contagem de organizações.
+
+A página mostra:
+
+- **Eventos por organização** em cada Salvamar: os eventos do período filtrado divididos pelo número de organizações subordinadas (Capitanias, Delegacias e Agências) daquele Salvamar. Quanto maior a razão, menos organizações existem para a quantidade de eventos da região.
+- Os dois números por trás dessa razão, lado a lado: o número de organizações (fixo, não muda com os filtros) e o número de eventos (varia com os filtros).
+- Uma tabela com todas as organizações de um Salvamar escolhido, e quantos eventos cada uma atendeu no recorte filtrado.
+
+Sem filtros, a correlação entre número de organizações e número de eventos é de 0,52 — moderada, não forte. O Norte tem a maior razão de eventos por organização (36,1); o Oeste, a menor (7,3).
 
 ## Áreas dos Distritos Navais
 
@@ -139,7 +154,8 @@ O nome do Salvamar que aparece no rótulo vem da própria planilha. Assim o mapa
 │   ├── calendario.py       # quando acontecem
 │   ├── areas_recorrentes.py# onde se repetem
 │   ├── pessoas.py          # pessoas envolvidas
-│   └── duracao.py          # duração dos eventos
+│   ├── duracao.py          # duração dos eventos
+│   └── estrutura.py        # estrutura x demanda
 ├── preparar_areas.py       # simplifica os arquivos das áreas dos Distritos Navais
 ├── requirements.txt        # dependências do projeto
 ├── .streamlit/
